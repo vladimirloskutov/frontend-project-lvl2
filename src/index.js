@@ -26,7 +26,11 @@ const genDiff = (filepath1, filepath2) => {
     return acc;
   }, {});
 
-  return JSON.stringify(result, null, '  ').split('"').join('');
+  return JSON.stringify(result, null, '  ')
+    .split(',')
+    .join('')
+    .split('"')
+    .join('');
 };
 
 export default genDiff;
