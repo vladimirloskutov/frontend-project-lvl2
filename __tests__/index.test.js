@@ -1,17 +1,10 @@
+import fs from 'fs';
 import genDiff from '../src/index.js';
 
-test('plain json', () => {
-  const before = '../file1.json';
-  const after = '../file2.json';
+test('json', () => {
+  const before = './__fixtures__/file1.json';
+  const after = './__fixtures__/file2.json';
+  const expected = fs.readFileSync(new URL('../__fixtures__/expected', import.meta.url), 'utf8');
 
-  const result = `{
-    - follow: false
-      host: hexlet.io
-    - proxy: 123.234.53.22
-    - timeout: 50
-    + timeout: 20
-    + verbose: true
-  }`;
-
-  expect(genDiff(before, after)).toEqual(result);
+  expect(genDiff(before, after)).toEqual(expected);
 });
