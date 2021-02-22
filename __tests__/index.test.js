@@ -8,3 +8,11 @@ test('json', () => {
 
   expect(genDiff(before, after)).toEqual(expected);
 });
+
+test('yaml', () => {
+  const before = './__fixtures__/file1.yml';
+  const after = './__fixtures__/file2.yml';
+  const expected = fs.readFileSync(new URL('../__fixtures__/expected', import.meta.url), 'utf8');
+
+  expect(genDiff(before, after)).toEqual(expected);
+});
