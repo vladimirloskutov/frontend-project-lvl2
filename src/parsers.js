@@ -4,11 +4,14 @@ import path from 'path';
 
 const parse = (filepath) => {
   const extension = path.extname(filepath);
-  if (extension === '.json') {
-    return JSON.parse(fs.readFileSync(filepath, 'utf8'));
+  switch (extension) {
+    case '.json':
+      return JSON.parse(fs.readFileSync(filepath, 'utf8'));
+    case '.yml':
+      return yaml.load(fs.readFileSync(filepath, 'utf8'));
+    default:
+      throw new Error(`Unknown file extension: '${extension}'!`);
   }
-
-  return yaml.load(fs.readFileSync(filepath, 'utf8'));
 };
 
 export default parse;

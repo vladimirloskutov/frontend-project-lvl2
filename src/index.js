@@ -1,37 +1,60 @@
 import buildAst from './buildAst.js';
 import parse from './parsers.js';
 
-// const stringify = (data, replacer = ' ', spacesCount = 1) => {
-//   const iter = (item, depth) => {
-//     if (typeof item !== 'object') {
-//       return item.toString();
-//     }
-//
-//     const paddingSize = spacesCount * depth;
-//     const openingPadding = replacer.repeat(paddingSize);
-//     const closingPadding = replacer.repeat(paddingSize - spacesCount);
-//
-//     const result = Object
-//         .entries(item)
-//         .map(([key, value]) => {
-//           return `${openingPadding}${key}: ${iter(value, depth + 1)}`;
-//         });
-//
-//     return [
-//         '{',
-//         ...result,
-//         `${closingPadding}}`,
-//     ].join('\n');
-//   };
-//
-//   return iter(data, 1);
-// };
+const stringify = (value, replacer = ' ', spacesCount = 1) => {
+  const iter = (currentValue, depth) => {
+    if (typeof currentValue !== 'object') {
+      return currentValue.toString();
+    }
+
+    if (currentValue === null) {
+      return null;
+    }
+
+    const indentSize = depth * spacesCount;
+    const currentIndent = replacer.repeat(indentSize);
+    const bracketIndent = replacer.repeat(indentSize - spacesCount);
+    const lines = Object
+        .entries(currentValue)
+        .map(([key, val]) => `${currentIndent}${key}: ${iter(val, depth + 1)}`);
+
+    return [
+      '{',
+      ...lines,
+      `${bracketIndent}}`,
+    ].join('\n');
+  };
+
+  return iter(value, 1);
+};
+
+const getStylish = (ast, depth = 1) => {
+  const indent = '  '.repeat(depth);
+  const lines = ast.flatMap((item) => {
+    if (item.type !== 'nested') {
+      if (item.type === 'added') {
+        return [`${indent}+ ${item.key}: ${stringify(item.value, indent)}`];
+      } else if (item.type === 'deleted') {
+        return [`${indent}- ${item.key}: ${stringify(item.value, indent)}`];
+      } else if (item.type === 'changed') {
+        return [`${indent}- ${item.key}: ${stringify(item.oldValue, indent)}`, `${indent}+ ${item.key}: ${stringify(item.newValue, indent)}`];
+      } else if (item.type === 'unchanged') {
+        return [`${indent}${item.key}: ${stringify(item.value)}`];
+      }
+    } else {
+      return [`${indent}${indent}${item.key}: ${getStylish(item.children, depth + 1)}${indent}`];
+    }
+  });
+
+  return ['{', ...lines, `${indent}}`].join('\n');
+};
 
 const genDiff = (filepath1, filepath2) => {
   const file1 = parse(filepath1);
   const file2 = parse(filepath2);
   const ast = buildAst(file1, file2);
-  return ast;
+  return getStylish(ast);
+  //return ast;
 };
 
 export default genDiff;
