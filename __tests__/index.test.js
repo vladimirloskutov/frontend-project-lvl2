@@ -18,3 +18,21 @@ test('stylish yml', () => {
 
   expect(genDiff(before, after, format)).toEqual(diff);
 });
+
+test('plain json', () => {
+  const before = './__fixtures__/before.json';
+  const after = './__fixtures__/after.json';
+  const format = 'plain';
+  const diff = fs.readFileSync(new URL('../__fixtures__/plainDiff.txt', import.meta.url), 'utf8');
+
+  expect(genDiff(before, after, format)).toEqual(diff);
+});
+
+test('plain yml', () => {
+  const before = './__fixtures__/before.yml';
+  const after = './__fixtures__/after.yml';
+  const format = 'plain';
+  const diff = fs.readFileSync(new URL('../__fixtures__/plainDiff.txt', import.meta.url), 'utf8');
+
+  expect(genDiff(before, after, format)).toEqual(diff);
+});

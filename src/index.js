@@ -1,6 +1,6 @@
 import buildAst from './buildAst.js';
 import parse from './parsers.js';
-import getFormattedTree from './formatter.js';
+import getFormattedTree from './formatters/index.js';
 
 const genDiff = (filepath1, filepath2, format = 'stylish') => {
   const file1 = parse(filepath1);
