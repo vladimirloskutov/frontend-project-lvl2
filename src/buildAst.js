@@ -7,11 +7,11 @@ const buildAst = (file1, file2) => {
 
   const ast = keys.map((key) => {
     if (_.isObject(file1[key]) && _.isObject(file2[key])) {
-        return {
-          key,
-          type: 'nested',
-          children: buildAst(file1[key], file2[key]),
-        };
+      return {
+        key,
+        type: 'nested',
+        children: buildAst(file1[key], file2[key]),
+      };
     }
 
     if (!_.has(file2, key)) {
@@ -46,6 +46,8 @@ const buildAst = (file1, file2) => {
         type: 'changed',
       };
     }
+
+    return null;
   });
 
   return ast;
