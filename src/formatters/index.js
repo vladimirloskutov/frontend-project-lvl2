@@ -7,6 +7,8 @@ const getFormattedTree = (ast, format) => {
       return getStylish(ast);
     case 'plain':
       return getPlain(ast);
+    case 'json':
+      return JSON.stringify(ast);
     default:
       throw new Error(`Unknown format: ${format}!`);
   }
