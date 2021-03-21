@@ -38,13 +38,7 @@ const filterValue = (itemValue, depth) => {
   return itemValue;
 };
 
-const formatString = (indent, itemKey, itemValue, depth, operationType = ' ') => {
-  if (filterValue(itemValue, depth) === '') {
-    return `${indent}  ${operationType} ${itemKey}:`;
-  }
-
-  return `${indent}  ${operationType} ${itemKey}: ${filterValue(itemValue, depth)}`;
-};
+const formatString = (indent, itemKey, itemValue, depth, operationType = ' ') => `${indent}  ${operationType} ${itemKey}: ${filterValue(itemValue, depth)}`;
 
 const getStylish = (ast) => {
   const iter = (node, depth) => {
