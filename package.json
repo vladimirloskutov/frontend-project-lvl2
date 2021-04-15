@@ -1,10 +1,13 @@
 {
-  "name": "@hexlet/code",
+  "name": "difference-calculator",
   "version": "1.0.0",
   "type": "module",
-  "description": "[![Actions Status](https://github.com/vladimirloskutov/frontend-project-lvl2/workflows/hexlet-check/badge.svg)](https://github.com/vladimirloskutov/frontend-project-lvl2/actions)",
+  "description": "Difference calculator - compares two configuration files and shows a difference.",
   "bin": {
     "gendiff": "bin/gendiff.js"
+  },
+  "engines": {
+    "node": ">=14"
   },
   "main": "./index.js",
   "scripts": {
@@ -20,10 +23,6 @@
     "url": "https://github.com/vladimirloskutov/frontend-project-lvl2/issues"
   },
   "homepage": "https://github.com/vladimirloskutov/frontend-project-lvl2#readme",
-  "jest": {
-    "testEnvironment": "node",
-    "transform": {}
-  },
   "devDependencies": {
     "eslint": "^7.19.0",
     "eslint-config-airbnb-base": "^14.2.1",

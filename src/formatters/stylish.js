@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const baseIndent = '    ';
 const operationTypes = {
   added: '+',
@@ -7,12 +9,12 @@ const operationTypes = {
 
 const stringify = (value, spacesCount = 1) => {
   const iter = (currentValue, depth) => {
-    if (typeof currentValue !== 'object') {
-      return currentValue.toString();
-    }
-
     if (currentValue === null) {
       return null;
+    }
+
+    if (!_.isObject(currentValue)) {
+      return currentValue.toString();
     }
 
     const indentSize = depth * spacesCount + 1;
@@ -40,20 +42,23 @@ const filterValue = (itemValue, depth) => {
 
 const formatString = (indent, itemKey, itemValue, depth, operationType = ' ') => `${indent}  ${operationType} ${itemKey}: ${filterValue(itemValue, depth)}`;
 
-const getStylish = (ast) => {
+const toStylish = (ast) => {
   const iter = (node, depth) => {
     const indent = baseIndent.repeat(depth);
 
     const lines = node.map((item) => {
-      if (item.type === 'nested') {
-        return [`${indent}    ${item.key}: ${iter(item.children, depth + 1)}`];
+      switch (item.type) {
+        case 'nested':
+          return [`${indent}    ${item.key}: ${iter(item.children, depth + 1)}`];
+        case 'changed':
+          return [`${formatString(indent, item.key, item.oldValue, depth, operationTypes.deleted)}\n${formatString(indent, item.key, item.newValue, depth, operationTypes.added)}`];
+        case 'added':
+        case 'deleted':
+        case 'unchanged':
+          return [formatString(indent, item.key, item.value, depth, operationTypes[item.type])];
+        default:
+          throw new Error(`Unknown node type: '${item.type}'!`);
       }
-
-      if (item.type === 'changed') {
-        return [`${formatString(indent, item.key, item.oldValue, depth, operationTypes.deleted)}\n${formatString(indent, item.key, item.newValue, depth, operationTypes.added)}`];
-      }
-
-      return [formatString(indent, item.key, item.value, depth, operationTypes[item.type])];
     });
 
     return ['{', ...lines, `${indent}}`].join('\n');
@@ -62,4 +67,4 @@ const getStylish = (ast) => {
   return iter(ast, 0);
 };
 
-export default getStylish;
+export default toStylish;

@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import buildAst from './buildAst.js';
 import parse from './parsers.js';
-import getFormattedTree from './formatters/index.js';
+import makeFormattedTree from './formatters/index.js';
 
 const getData = (filepath) => ({
   data: fs.readFileSync(filepath, 'utf8'),
@@ -15,5 +15,5 @@ export default (filepath1, filepath2, format = 'stylish') => {
   const parsedData1 = parse(data1.data, data1.type);
   const parsedData2 = parse(data2.data, data2.type);
   const ast = buildAst(parsedData1, parsedData2);
-  return getFormattedTree(ast, format);
+  return makeFormattedTree(ast, format);
 };

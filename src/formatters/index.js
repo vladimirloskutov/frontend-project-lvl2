@@ -1,17 +1,15 @@
-import getStylish from './stylish.js';
-import getPlain from './plain.js';
+import toStylish from './stylish.js';
+import toPlain from './plain.js';
 
-const getFormattedTree = (ast, format) => {
+export default (ast, format) => {
   switch (format) {
     case 'stylish':
-      return getStylish(ast);
+      return toStylish(ast);
     case 'plain':
-      return getPlain(ast);
+      return toPlain(ast);
     case 'json':
       return JSON.stringify(ast);
     default:
       throw new Error(`Unknown format: ${format}!`);
   }
 };
-
-export default getFormattedTree;

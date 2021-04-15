@@ -10,17 +10,15 @@ const stylishFormat = 'stylish';
 const plainFormat = 'plain';
 const jsonFormat = 'json';
 
-const stylishDiff = fs.readFileSync(new URL('../__fixtures__/stylishDiff.txt', import.meta.url), 'utf8');
-const plainDiff = fs.readFileSync(new URL('../__fixtures__/plainDiff.txt', import.meta.url), 'utf8');
-const jsonDiff = fs.readFileSync(new URL('../__fixtures__/jsonDiff.txt', import.meta.url), 'utf8');
+const makeDiffPath = (format) => fs.readFileSync(new URL(`../__fixtures__/${format}Diff.txt`, import.meta.url), 'utf8');
 
 test.each([
-  [beforeJson, afterJson, stylishFormat, stylishDiff],
-  [beforeYml, afterYml, stylishFormat, stylishDiff],
-  [beforeJson, afterJson, plainFormat, plainDiff],
-  [beforeYml, afterYml, plainFormat, plainDiff],
-  [beforeJson, afterJson, jsonFormat, jsonDiff],
-  [beforeYml, afterYml, jsonFormat, jsonDiff],
-])('test', (before, after, format, diff) => {
+  [beforeJson, afterJson, stylishFormat, makeDiffPath(stylishFormat)],
+  [beforeYml, afterYml, stylishFormat, makeDiffPath(stylishFormat)],
+  [beforeJson, afterJson, plainFormat, makeDiffPath(plainFormat)],
+  [beforeYml, afterYml, plainFormat, makeDiffPath(plainFormat)],
+  [beforeJson, afterJson, jsonFormat, makeDiffPath(jsonFormat)],
+  [beforeYml, afterYml, jsonFormat, makeDiffPath(jsonFormat)],
+])('test (%s, %s, %s)', (before, after, format, diff) => {
   expect(genDiff(before, after, format)).toEqual(diff);
 });

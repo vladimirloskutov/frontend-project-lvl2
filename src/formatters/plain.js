@@ -12,28 +12,27 @@ const stringify = (value) => {
   return value;
 };
 
-const getPlain = (ast) => {
+const makeFullPath = (path, item) => (path === '' ? item : `${path}.${item}`);
+
+const toPlain = (ast) => {
   const iter = (node, currentPath) => {
     const lines = node.map((item) => {
-      const fullPath = currentPath === '' ? item.key : `${currentPath}.${item.key}`;
+      const fullPath = makeFullPath(currentPath, item.key);
 
-      if (item.type === 'nested') {
-        return iter(item.children, fullPath);
+      switch (item.type) {
+        case 'nested':
+          return iter(item.children, fullPath);
+        case 'deleted':
+          return `Property '${fullPath}' was removed`;
+        case 'added':
+          return `Property '${fullPath}' was added with value: ${stringify(item.value)}`;
+        case 'changed':
+          return `Property '${fullPath}' was updated. From ${stringify(item.oldValue)} to ${stringify(item.newValue)}`;
+        case 'unchanged':
+          return null;
+        default:
+          throw new Error(`Unknown node type: '${item.type}'!`);
       }
-
-      if (item.type === 'deleted') {
-        return `Property '${fullPath}' was removed`;
-      }
-
-      if (item.type === 'added') {
-        return `Property '${fullPath}' was added with value: ${stringify(item.value)}`;
-      }
-
-      if (item.type === 'changed') {
-        return `Property '${fullPath}' was updated. From ${stringify(item.oldValue)} to ${stringify(item.newValue)}`;
-      }
-
-      return null;
     });
 
     return lines.filter((item) => item).join('\n');
@@ -42,4 +41,4 @@ const getPlain = (ast) => {
   return iter(ast, '');
 };
 
-export default getPlain;
+export default toPlain;
