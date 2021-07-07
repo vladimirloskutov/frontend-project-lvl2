@@ -1,25 +1,22 @@
 import _ from 'lodash';
 
-const baseIndent = '    ';
+const baseIndent = 4;
+const calculateIndent = (depth, indent, sliceNumber = 0) => ' '.repeat(indent * depth + 2).slice(sliceNumber);
 const operationTypes = {
-  added: '+',
-  deleted: '-',
-  unchanged: ' ',
+  added: '+ ',
+  deleted: '- ',
+  unchanged: '  ',
 };
 
-const stringify = (value, spacesCount = 1) => {
+const stringify = (value, spacesCount) => {
   const iter = (currentValue, depth) => {
-    if (currentValue === null) {
-      return null;
-    }
-
     if (!_.isObject(currentValue)) {
-      return currentValue.toString();
+      return currentValue;
     }
 
-    const indentSize = depth * spacesCount + 1;
-    const currentIndent = baseIndent.repeat(indentSize);
-    const bracketIndent = baseIndent.repeat(indentSize - 1);
+    const indentSize = depth + 2;
+    const currentIndent = calculateIndent(indentSize, baseIndent, 2);
+    const bracketIndent = calculateIndent(indentSize - 1, baseIndent, 2);
     const lines = Object.entries(currentValue).map(([key, val]) => `${currentIndent}${key}: ${iter(val, depth + 1)}`);
 
     return [
@@ -29,39 +26,31 @@ const stringify = (value, spacesCount = 1) => {
     ].join('\n');
   };
 
-  return iter(value, 1);
+  return iter(value, spacesCount);
 };
-
-const filterValue = (itemValue, depth) => {
-  if (typeof itemValue === 'object') {
-    return stringify(itemValue, depth + 1);
-  }
-
-  return itemValue;
-};
-
-const formatString = (indent, itemKey, itemValue, depth, operationType = ' ') => `${indent}  ${operationType} ${itemKey}: ${filterValue(itemValue, depth)}`;
 
 const toStylish = (ast) => {
   const iter = (node, depth) => {
-    const indent = baseIndent.repeat(depth);
-
+    const indent = calculateIndent(depth, baseIndent);
+    const bracketIndent = calculateIndent(depth, baseIndent, 2);
     const lines = node.map((item) => {
       switch (item.type) {
         case 'nested':
-          return [`${indent}    ${item.key}: ${iter(item.children, depth + 1)}`];
+          return [`${indent}  ${item.key}: ${iter(item.children, depth + 1)}`];
         case 'changed':
-          return [`${formatString(indent, item.key, item.oldValue, depth, operationTypes.deleted)}\n${formatString(indent, item.key, item.newValue, depth, operationTypes.added)}`];
+          return [`${indent}${operationTypes.deleted}${item.key}: ${stringify(item.oldValue, depth)}\n${indent}${operationTypes.added}${item.key}: ${stringify(item.newValue, depth)}`];
         case 'added':
+          return [`${indent}${operationTypes[item.type]}${item.key}: ${stringify(item.value, depth)}`];
         case 'deleted':
+          return [`${indent}${operationTypes[item.type]}${item.key}: ${stringify(item.value, depth)}`];
         case 'unchanged':
-          return [formatString(indent, item.key, item.value, depth, operationTypes[item.type])];
+          return [`${indent}${operationTypes[item.type]}${item.key}: ${stringify(item.value, depth)}`];
         default:
           throw new Error(`Unknown node type: '${item.type}'!`);
       }
     });
 
-    return ['{', ...lines, `${indent}}`].join('\n');
+    return ['{', ...lines, `${bracketIndent}}`].join('\n');
   };
 
   return iter(ast, 0);
